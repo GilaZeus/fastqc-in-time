@@ -50,7 +50,9 @@ def read_input(data):
 
 
 def main():
-    # Prints output with comma as separator.
+    """Prints output with comma as separator.
+    
+    Single line of output: "technology name,date,phred score,count"."""
     fastq = read_input(sys.stdin)
     acc_num = get_acc_num(next(fastq))
     name, date = get_meta(acc_num)
