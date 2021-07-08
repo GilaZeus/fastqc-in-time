@@ -1,3 +1,8 @@
+"""Reducer for Hadoop.
+
+Be careful, that it cannot work outside of Hadoop's environment:
+The mapper function must also sort all values."""
+
 # Work with standard input.
 import sys
 # Libs to sort input.
@@ -26,7 +31,7 @@ def main():
             for item in group:
                 total_phred += int(item[-2])
                 total_len += int(item[-1])
-            print(",".join([item[0], item[1], str(total_phred / total_len)]))
+            print(",".join([item[0], item[1], str(total_phred), str(total_len)]))
         except:
             pass
         
