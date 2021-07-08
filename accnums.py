@@ -40,8 +40,7 @@ def get_date():
 
 def main():
     # Get the date from sys.argv
-    #date = get_date()
-    date = "2021/07/07"
+    date = get_date()
     # Build a search request for all entries on a chosen day.
     search_request = "(\"" + date + "\"[Publication Date] : \"" + date + "\"[Publication Date] NOT 0[Mbases])"
     
