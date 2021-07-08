@@ -1,3 +1,7 @@
+"""Mapper for Hadoop.
+
+Be careful, that this mapper function does not sort all values."""
+
 # Work with standard input.
 import sys
 # Lib to parse run's metadata.
