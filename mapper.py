@@ -18,7 +18,8 @@ def get_meta(acc_num):
         return None
     else:
         try:
-            result = (csv["LibraryStrategy"][0], csv["ReleaseDate"][0][ : 10])
+            # In data field only month and year are interesting for us.
+            result = (csv["LibraryStrategy"][0], csv["ReleaseDate"][0][ : 7])
         except KeyError:
             return None
         else:
