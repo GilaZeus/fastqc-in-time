@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Get accession numbers of sequencings on a single day, print them to stdout.
 
 Usage: ./accnums YYYY/MM/DD"""

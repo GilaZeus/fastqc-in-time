@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Reducer for Hadoop.
 
 Be careful, that it cannot work outside of Hadoop's environment:

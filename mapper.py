@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Mapper for Hadoop.
 
 Be careful, that this mapper function does not sort all values."""
