@@ -7,7 +7,7 @@ Be careful, that this mapper function does not sort all values."""
 import sys
 # Lib to parse run's metadata.
 import pandas as pd
-
+from functools import reduce
 
 def get_meta(acc_num):
     """Get run's metadata using its accession number.
@@ -19,7 +19,7 @@ def get_meta(acc_num):
         return None
     else:
         try:
-            # In data field only month and year are interesting for us.
+            # In date field only month and year are interesting for us.
             result = (csv["LibraryStrategy"][0], csv["ReleaseDate"][0][ : 7])
         except KeyError:
             return None
@@ -61,12 +61,16 @@ def main():
     fastq = read_input(sys.stdin)
     acc_num = get_acc_num(next(fastq))
     name, date = get_meta(acc_num)
+    total_phred = 0
+    total_len = 0
     for line in fastq:
         if line[1] == 3:
-            for char in line[0]:
-                # Information on Phred-score encoding in FASTQ-files:
-                # http://people.duke.edu/~ccc14/duke-hts-2018/bioinformatics/quality_scores.html
-                print(",".join([name, date, str(ord(char) - 33), "1"]))
+            # Information on Phred-score encoding in FASTQ-files:
+            # http://people.duke.edu/~ccc14/duke-hts-2018/bioinformatics/quality_scores.html
+            total_phred += reduce(lambda x, y: x + y, map(lambda x: ord(x) - 33, line[0]))
+            total_len += len(line[0])
+    
+    print(",".join([name, date, str(total_phred), str(total_len)]))
 
 
 if __name__ == "__main__":
