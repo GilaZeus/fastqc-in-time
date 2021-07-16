@@ -41,7 +41,7 @@ def map_fastq(acc_num):
     """Prints output with comma as separator.
     
     Single line of output: "technology name,date,phred score,count"."""
-    fastq = subprocess.check_output(["fastq-dump", acc_num, "-Z"]).decode('utf-8').split("\n")
+    fastq = subprocess.check_output(["fastq-dump", acc_num, "-Zv"]).decode('utf-8').split("\n")
     name, date = get_meta(acc_num)
     total_phred = 0
     total_len = 0
