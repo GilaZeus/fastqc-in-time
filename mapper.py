@@ -64,5 +64,4 @@ def main():
         map_fastq(line.strip())
 
 
-if __name__ == "__main__":
-    main()
+main()
