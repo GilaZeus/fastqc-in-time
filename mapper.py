@@ -7,8 +7,10 @@ Be careful, that this mapper function does not sort all values."""
 import sys
 # Lib to parse run's metadata.
 import pandas as pd
-from functools import reduce
+# Effective parsing output of fastq-dump.
 import subprocess
+from functools import reduce
+
 
 def get_meta(acc_num):
     """Get run's metadata using its accession number.
@@ -41,12 +43,17 @@ def map_fastq(acc_num):
     """Prints output with comma as separator.
     
     Single line of output: "technology name,date,phred score,count"."""
-    fastq = subprocess.check_output(["fastq-dump-orig.2.11.0", "-Z", acc_num]).decode('utf-8').split("\n")
-    name, date = get_meta(acc_num)
+    process = subprocess.Popen(["fastq-dump-orig.2.11.0", "-Z", acc_num], stdout=subprocess.PIPE, bufsize=-1)
     total_phred = 0
     total_len = 0
     i = 0
-    for line in fastq:
+    while True:
+        line = process.stdout.readline()
+        line = line.strip().decode("utf-8")
+
+        if line == "":
+            break
+        
         if i == 3:
             # Information on Phred-score encoding in FASTQ-files:
             # http://people.duke.edu/~ccc14/duke-hts-2018/bioinformatics/quality_scores.html
@@ -56,6 +63,9 @@ def map_fastq(acc_num):
         if i == 4:
             i = 0
     
+    process.kill()
+
+    name, date = get_meta(acc_num)    
     print(",".join([name, date, str(total_phred), str(total_len)]))
 
 
