@@ -43,30 +43,34 @@ def map_fastq(acc_num):
     """Prints output with comma as separator.
     
     Single line of output: "technology name,date,phred score,count"."""
-    process = subprocess.Popen(["fastq-dump-orig.2.11.0", "-Z", acc_num], stdout=subprocess.PIPE, bufsize=-1)
-    total_phred = 0
-    total_len = 0
-    i = 0
-    while True:
-        line = process.stdout.readline()
-        line = line.strip().decode("utf-8")
-
-        if line == "":
-            break
-        
-        if i == 3:
-            # Information on Phred-score encoding in FASTQ-files:
-            # http://people.duke.edu/~ccc14/duke-hts-2018/bioinformatics/quality_scores.html
-            total_phred += reduce(lambda x, y: x + y, map(lambda x: ord(x) - 33, line))
-            total_len += len(line)
-        i += 1
-        if i == 4:
-            i = 0
+    meta = get_meta(acc_num)
+    if meta != None:
+        name, date = get_meta(acc_num)
     
-    process.kill()
+        process = subprocess.Popen(["fastq-dump-orig.2.11.0", "-Z", acc_num], stdout=subprocess.PIPE, bufsize=-1)
+        total_phred = 0
+        total_len = 0
+        i = 0
+        while True:
+            line = process.stdout.readline()
+            line = line.strip().decode("utf-8")
 
-    name, date = get_meta(acc_num)    
-    print(",".join([name, date, str(total_phred), str(total_len)]))
+            if line == "":
+                break
+        
+            if i == 3:
+                # Information on Phred-score encoding in FASTQ-files:
+                # http://people.duke.edu/~ccc14/duke-hts-2018/bioinformatics/quality_scores.html
+                total_phred += reduce(lambda x, y: x + y, map(lambda x: ord(x) - 33, line))
+                total_len += len(line)
+            i += 1
+            if i == 4:
+                i = 0
+    
+        process.kill()
+    
+            
+        print(",".join([name, date, str(total_phred), str(total_len)]))
 
 
 def main():
