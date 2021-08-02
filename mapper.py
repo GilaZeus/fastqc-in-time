@@ -18,7 +18,7 @@ def get_meta(acc_num):
     Returns (library strategy, release date) or None, if data is not inaccessible or uncoplete."""
     try:
         csv = pd.read_csv("https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&rettype=runinfo&term=" + acc_num)
-    except pandas.errors.EmptyDataError:
+    except pd.errors.EmptyDataError:
         return None
     else:
         try:
