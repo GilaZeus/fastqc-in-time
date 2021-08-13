@@ -5,29 +5,9 @@ Be careful, that this mapper function does not sort all values."""
 
 # Work with standard input.
 import sys
-# Lib to parse run's metadata.
-import pandas as pd
 # Effective parsing output of fastq-dump.
 import subprocess
 from functools import reduce
-
-
-def get_meta(acc_num):
-    """Get run's metadata using its accession number.
-
-    Returns (library strategy, release date) or None, if data is not inaccessible or uncoplete."""
-    try:
-        csv = pd.read_csv("https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&rettype=runinfo&term=" + acc_num)
-    except pd.errors.EmptyDataError:
-        return None
-    else:
-        try:
-            # In date field only month and year are interesting for us.
-            result = (csv["LibraryStrategy"][0], csv["ReleaseDate"][0][ : 7])
-        except KeyError:
-            return None
-        else:
-            return result
 
 
 def read_input(data):
@@ -39,14 +19,12 @@ def read_input(data):
 
 
 
-def map_fastq(acc_num):
+def map_fastq(entry):
     """Prints output with comma as separator.
     
     Single line of output: "technology name,date,phred score,count"."""
-    meta = get_meta(acc_num)
-    if meta != None:
-        name, date = get_meta(acc_num)
-    
+    name, date, acc_num = entry.split(",")
+    try:
         process = subprocess.Popen(["fastq-dump-orig.2.11.0", "-Z", acc_num], stdout=subprocess.PIPE, bufsize=-1)
         total_phred = 0
         total_len = 0
@@ -67,10 +45,11 @@ def map_fastq(acc_num):
             if i == 4:
                 i = 0
     
-        process.kill()
-    
-            
         print(",".join([name, date, str(total_phred), str(total_len)]))
+    except OSError:
+        pass
+    finally:
+        process.kill()
 
 
 def main():
