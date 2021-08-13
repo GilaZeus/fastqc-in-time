@@ -67,7 +67,7 @@ def get_meta(acc_num):
     try:
         # Avoid entries without meta data and connection crushes.
         csv = pd.read_csv("https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&rettype=runinfo&term=" + acc_num)
-    except (pd.errors.EmptyDataError, urllib.error.URLError) as error:
+    except (pd.errors.EmptyDataError, urllib.error.URLError, OSError) as error:
         return None
     else:
         try:
