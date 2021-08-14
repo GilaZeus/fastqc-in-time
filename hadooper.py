@@ -2,6 +2,7 @@
 """Run hadoop separately for each three months."""
 import subprocess
 import os
+import sys
 
 
 def hadoop_call(input_folder="tmp", result_folder="result",
