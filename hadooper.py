@@ -23,7 +23,7 @@ def hadoop_chain(input_folder="tmp", result_folder="result",
     
     subfolders = os.listdir(input_folder)
     for subfolder in subfolders:
-        if os.path.isdir(subfolder):
+        if os.path.isdir(input_folder + "/" + subfolder):
             hadoop_call(input_folder=input_folder + "/" + subfolder,
                         result_folder=result_folder + "/" + subfolder,
                         mapper=mapper, reducer=reducer)
