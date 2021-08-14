@@ -25,7 +25,7 @@ def map_fastq(entry):
     Single line of output: "technology name,date,phred score,count"."""
     name, date, acc_num = entry.split(",")
     
-    process = subprocess.Popen(["fastq-dump-orig.2.11.0", "-Z", acc_num], stdout=subprocess.PIPE, bufsize=-1)
+    process = subprocess.Popen(["fastq.tar/fastq-dump-orig.2.11.0", "-Z", acc_num], stdout=subprocess.PIPE, bufsize=-1)
     total_phred = 0
     total_len = 0
     i = 0
