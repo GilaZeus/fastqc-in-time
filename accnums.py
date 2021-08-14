@@ -9,6 +9,7 @@ import requests
 import re
 from datetime import datetime
 import urllib
+import urllib3
 import pandas as pd
 
 # A more clearer name for ValueError in our case.
@@ -33,36 +34,59 @@ def check_date(date):
         raise WrongArgumentError("The date must consist of numbers and exist!")
     
 
-def get_accnums_body(date):
-    """Get all accnums for a chosen date.
+def accnum_iter(date, min_len=5, max_len=10):
+    """Iterator for the first appearances of each sequencing platform for a chosen date.
 
-    Return plain text with accnums."""
+    Return "platform,release date,accession number"."""
     check_date(date)
-
+    # Build a string for selected appropriate sequencing length.
+    mbases = "("
+    for i in range(min_len, max_len + 1):
+        mbases += "(\"{0:011d}\"[Mbases]) OR ".format(i)
+    mbases = mbases[: -4] + ")"
     # Build a search request for all entries on a chosen day.
-    search_request = "((txid2697049[Organism:noexp] NOT 0[Mbases)) AND (\"" + date + "\"[Publication Date] : \"" + date + "\"[Publication Date])"
+    search_request = mbases + " AND (\"" + date + \
+                     "\"[Publication Date] : \"" + date + "\"[Publication Date]) AND (\""
     
-    # Send a request.
-    url = "https://www.ncbi.nlm.nih.gov/sra"
-    s = requests.Session()
-    s.post(url, data = {"term" : search_request})
-    search = s.get("https://www.ncbi.nlm.nih.gov/sra/advanced")
+    # List of differen sequencing platforms.
+    seq_platforms = ["abi solid", "bgiseq", "capillary", "complete genomics",
+                     "helicos", "illumina", "ion torrent", "ls454",
+                     "oxford nanopore", "pacbio smrt"]
+
+    for seq_platform in seq_platforms:
+        # Send a request and handle connection issues.
+        acc_num = None
+        while acc_num is None:
+            try:
+                # Sometimes it gets empty result, so re.search returns None.
+                id = None
+                while id is None:
+                    url = "https://www.ncbi.nlm.nih.gov/sra"
+                    s = requests.Session()
+                    s.post(url, data = {"term" : search_request + seq_platform + "\"[Platform])"})
+                    search = s.get("https://www.ncbi.nlm.nih.gov/sra/advanced")
     
-    # Extract the search-ID.
-    id = re.search(r"MCID_[\w]*", search.text)[0]
+                        # Extract the search-ID.
+                    id = re.search(r"MCID_[\w]*", search.text)
+                id = id[0]
 
-    # get the accession numbers and print them as text.
-    acc_nums = requests.get("https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&rettype=acclist&db=sra&WebEnv=" + id + "&query_key=1")
-
-    return acc_nums.text
-
-
-def get_accnums_as_list(date):
-    return get_accnums_body(date).split("\n")
-
+                # get the first accession number and safe them as text:
+                # "platform,release date,accession number"
+                acc_num = requests.get("https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&rettype=acclist&db=sra&WebEnv=" +
+                                       id + "&query_key=1").text
+                acc_num = acc_num[: acc_num.find("\n")]
+            except requests.exceptions.ConnectionError:
+                pass
+        if acc_num != "":
+            print(seq_platform, acc_num)
+            yield ",".join([seq_platform, date[: - 3], acc_num])
+        else:
+            continue
+            
 
 def get_meta(acc_num):
-    """Get run's metadata using its accession number.
+    """DEPRECATED
+    Get run's metadata using its accession number.
 
     Return (library strategy, release date) or None, if data is not inaccessible or uncoplete."""
     try:
@@ -81,10 +105,11 @@ def get_meta(acc_num):
 
 
 def get_all_meta(acc_nums, skip=True):
-    """Get meta data for all accession numbers stored as iterable. If skip=True,
+    """DEPRECATED
+    Get meta data for all accession numbers stored as iterable. If skip=True,
     save only the first appearance of a library strategy on this day.
 
-    Return list of strings: "library strategy,release date,accession number"."""
+    Return list of strings: "platform,release date,accession number"."""
     result = []
     if skip:
         libs = []
@@ -102,9 +127,6 @@ def get_all_meta(acc_nums, skip=True):
     return result
 
 
-
-
-
 def main():
     # Get the date from sys.argv
     # Check if input is there.
@@ -112,8 +134,8 @@ def main():
         date = sys.argv[1]
     except IndexError:
         raise WrongArgumentError("You must submit at least one argument!")
-    acc_nums = get_accnums_body(date)
-    print(acc_nums)
+    for acc_num in accnum_iter(date):
+        print(acc_num)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""New mapper for Hadoop.
+"""DEPRECATED mapper for Hadoop. Does not store any data on the harddrive.
 
 Be careful, that this mapper function does not sort all values."""
 
