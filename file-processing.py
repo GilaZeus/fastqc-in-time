@@ -1,23 +1,27 @@
 #!/usr/bin/env python3
-import subprocess
-import sys
-
-def get_month(file_name):
-    """Safe all FASTQ-files from a month file's entries.
-    
-    Save results in ~/tmp."""
-    with open(file_name) as data:
-        for line in data:
-            acc_num = line.strip().split(",")[2]
-            subprocess.run(["fasterq-dump", acc_num, "-O ~/tmp"])
+import datetime
+import accnums
 
 
 def main():
-    try:
-        file_name = sys.argv[1]
-    except IndexError:
-        raise WrongArgumentError("You must submit at least one argument!")
-    get_month(file_name)
+    start_date = datetime.date(2020, 11, 30)
+    end_date = datetime.date(2020, 10, 1)
+    delta = datetime.timedelta(days=1)
+
+    while start_date >= end_date:
+        month = start_date.month
+
+        with open("tmp/" + str(start_date)[: -3], "w") as data:
+            while month == start_date.month:
+                date_str = "{0}/{1:02d}/{2:02d}".format(start_date.year,
+                                                        start_date.month,
+                                                        start_date.day)
+
+                for acc_num in accnums.accnum_iter(date_str):
+                    if acc_num != "":
+                        data.write(acc_num + "\n")
+
+                start_date -= delta
 
 
 if __name__ == "__main__":
