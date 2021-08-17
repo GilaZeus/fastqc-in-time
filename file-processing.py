@@ -9,22 +9,22 @@ import os
 def get_month(file_name, separator=";LINE;;"):
     """Safe all FASTQ-files from a month file's entries in a new format.
     
-    Save results in ~/tmp."""
+    Save results in /tmp."""
     with open(file_name) as data:
         for line in data:
             fastq_transform(line, separator=separator)
 
 
 def fastq_transform(entry, separator=";;LINE;;"):
-    """Safe FASTQ-files in new format in ~/tmp.
+    """Safe FASTQ-files in new format in /tmp.
     
     The standard TextInputFormat of Hadoop processes each line separately, but FASTQ-format
     contains multiple 4-line records.  So it is important to write a new TextInputFormat or
     to safe the FASTQ-files in new format, which packs every run in a single line."""
-    acc_num = line.strip().split(",")[2]
+    acc_num = entry.strip().split(",")[2]
     
-    with open("~/tmp/" + acc_num + ".fasth", "w") as data:
-        process = subprocess.Popen(["fastq.tar/fastq-dump-orig.2.11.0", "-Z", acc_num],
+    with open("tmp/" + acc_num + ".fasth", "w") as data:
+        process = subprocess.Popen(["fastq-dump-orig.2.11.0", "-Z", acc_num],
                                    stdout=subprocess.PIPE, bufsize=-1)
         i = 0
         while True:
