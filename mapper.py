@@ -29,7 +29,7 @@ def map_fastq(entry, meta, separator=";;LINE;;"):
 
 
 def main():
-    meta = pickle.load(open("meta.dat", "rb"))
+    meta = pickle.load(open("fastq.tar/meta.dat", "rb"))
     for line in read_input(sys.stdin):
         map_fastq(line.strip(), meta)
 
