@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Run hadoop separately for each three months."""
+"""Run hadoop separately for each subfolder."""
 import subprocess
 import os
 import sys
 
 
 def hadoop_call(input_folder="tmp", result_folder="result",
-                mapper="fastqc-in-time/mapper_old.py",
+                mapper="fastqc-in-time/mapper.py",
                 reducer="fastqc-in-time/reducer.py"):
     """Call hadoop for data in input_folder, safe it under result_folder."""
    
@@ -17,7 +17,7 @@ def hadoop_call(input_folder="tmp", result_folder="result",
 
 
 def hadoop_chain(input_folder="tmp", result_folder="result",
-                 mapper="fastqc-in-time/mapper_old.py",
+                 mapper="fastqc-in-time/mapper.py",
                  reducer="fastqc-in-time/reducer.py"):
     """Chain hadoop for subfolders in folder."""
     
