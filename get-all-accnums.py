@@ -18,8 +18,7 @@ def main():
                                                         start_date.day)
 
                 for acc_num in accnums.accnum_iter(date_str):
-                    if acc_num != "":
-                        data.write(acc_num + "\n")
+                    data.write(acc_num + "\n")
         
                 start_date -= delta
 
